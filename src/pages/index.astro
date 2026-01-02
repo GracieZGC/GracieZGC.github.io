@@ -1,0 +1,316 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Gracie's Blog" description="Personal homepage">
+	<div class="container resumeContainer">
+		<div class="splitPage">
+			<aside class="leftPane" aria-label="左侧信息">
+					<div class="leftTop">
+						<h1 class="name">你好，我是占观晨</h1>
+						<h2 class="role">一名 AI 产品经理</h2>
+						<p class="tagline">让 AI 产品从能用，到好用，再到可持续。</p>
+
+						<nav class="sectionNav" aria-label="分区导航">
+							<a class="sectionLink is-active" href="#about" data-section-link="about">
+								<span class="line" aria-hidden="true"></span>
+								<span class="label">关于我</span>
+						</a>
+						<a class="sectionLink" href="#jobs" data-section-link="jobs">
+							<span class="line" aria-hidden="true"></span>
+							<span class="label">职业经历</span>
+						</a>
+						<a class="sectionLink" href="#explore" data-section-link="explore">
+							<span class="line" aria-hidden="true"></span>
+							<span class="label">AI 跨界探索</span>
+						</a>
+						<a class="sectionLink" href="#lab" data-section-link="lab">
+							<span class="line" aria-hidden="true"></span>
+							<span class="label">我的 AI 实验室</span>
+						</a>
+							<a class="sectionLink" href="#stack" data-section-link="stack">
+								<span class="line" aria-hidden="true"></span>
+								<span class="label">技术栈 / 工具箱</span>
+							</a>
+					</nav>
+
+					<div class="navSocial" aria-label="社交链接">
+						<a
+							class="socialIcon"
+							href="https://github.com/GracieZGC?tab=repositories"
+							aria-label="GitHub"
+							target="_blank"
+							rel="noreferrer"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								role="img"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<title>GitHub</title>
+								<path
+									d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"
+								></path>
+							</svg>
+						</a>
+						<a
+							class="socialIcon"
+							href="mailto:zhanguanchen97@gmail.com"
+							aria-label="Email"
+							target="_blank"
+							rel="noreferrer"
+						>
+							<svg
+								t="1767247719663"
+								class="icon"
+								viewBox="0 0 1024 1024"
+								version="1.1"
+								xmlns="http://www.w3.org/2000/svg"
+								p-id="5885"
+								width="200"
+								height="200"
+							>
+								<path
+									d="M69.12 929.28L222.72 960V412.16c-51.2-37.376-102.4-75.264-153.6-112.64v629.76z"
+									fill="#3399FF"
+									p-id="5886"
+								></path>
+								<path
+									d="M514.56 632.32C366.08 521.216 217.6 410.624 69.12 299.52c-3.584-6.144-11.264-20.992-10.24-40.96 1.536-24.576 15.36-40.448 20.48-46.08 13.312-13.824 28.16-18.432 35.84-20.48 15.872-4.096 29.184-1.536 35.84 0 121.344 88.576 242.176 177.664 363.52 266.24 95.744-71.68 190.976-143.36 286.72-215.04v179.2c-95.744 70.144-190.976 139.776-286.72 209.92z"
+									fill="#FF3333"
+									p-id="5887"
+								></path>
+								<path
+									d="M954.88 929.28V304.64c-51.2 39.424-102.4 78.336-153.6 117.76v542.72c51.2-11.776 102.4-24.064 153.6-35.84z"
+									fill="#339966"
+									p-id="5888"
+								></path>
+								<path
+									d="M801.28 243.2v174.08c51.2-37.376 102.4-75.264 153.6-112.64 1.536-11.776 3.584-24.064 5.12-35.84-0.512-8.704-2.56-26.112-15.36-40.96-9.216-10.752-19.968-15.872-30.72-20.48-16.384-7.168-31.232-9.728-40.96-10.24-24.064 15.36-47.616 30.72-71.68 46.08z"
+									fill="#FFCC00"
+									p-id="5889"
+								></path>
+							</svg>
+						</a>
+					</div>
+				</div>
+			</aside>
+
+					<div class="rightPane" data-home-scroll aria-label="右侧内容">
+						<section id="about" class="rightSection">
+							<h2 class="numbered-heading">关于我</h2>
+							<p>你好，我是一名 AI 产品经理。</p>
+							<p>
+								我喜欢做的事情，是把人的直觉、经验和模糊判断，慢慢拆成 AI 真正能执行的东西。
+							</p>
+							<p>
+								我对 AI 的兴趣并不是从模型参数开始的，而是从一个更现实更有挑战性的问题开始：在高专业、强风险的场景里，怎么让 AI
+								既好用，又不坑人？
+							</p>
+							<p>
+								所以我平时更多在干这些事：拆意图、设计追问、做路由、搭知识和评测体系、加安全护栏。
+							</p>
+							<p>
+								这个网站会记录我做过的产品、一些没写进 PRD 的思考，以及偶尔跑偏但挺有意思的小实验。
+							</p>
+						</section>
+
+					<section id="jobs" class="rightSection">
+					<h2 class="numbered-heading">职业经历</h2>
+					<p class="expIntro">在阿里健康，我深度参与过一个基于大模型的健康导购 / 客服能力建设项目。</p>
+					<article class="expCard" aria-label="阿里健康经历">
+							<div class="expMeta">2022 — 2024</div>
+							<div class="expBody">
+								<h3 class="expTitle">AI 产品经理 · 阿里健康</h3>
+								<p class="expLead">AI 医疗智能导购机器人</p>
+								<ul class="expList">
+									<li>
+										基于阿里通义千问训练的医疗大模型，构建商品导购 + 商品咨询场景的对话系统，结合产品策略不断优化模型效果。
+									</li>
+									<li>参与完成从构建、训练数据、评测模型、测试上线医疗 Agent 的全链路 SOP。</li>
+									<li>产品策略包括导购 query 分类、回复策略、评测标准制定、上线结果优化等。</li>
+								</ul>
+								<div class="expTags" aria-label="相关标签">
+									<span class="expTag">Multi-Agent</span>
+									<span class="expTag">医疗安全</span>
+								<span class="expTag">评测体系</span>
+								<span class="expTag">RAG</span>
+							</div>
+						</div>
+					</article>
+					</section>
+
+					<section id="explore" class="rightSection">
+						<h2 class="numbered-heading">AI 跨界探索</h2>
+						<p class="expIntro">后来我收获了一些新的尝试和变化</p>
+						<article class="expCard" aria-label="AI 跨界探索经历">
+							<div class="expMeta">2025 — 至今</div>
+							<div class="expBody">
+								<h3 class="expTitle">AI 跨界探索 · AIGC / 非遗文化</h3>
+								<p class="expLead">把 AI 带进“没那么标准化”的真实世界，看看它还能跑多远。</p>
+								<ul class="expList">
+									<li>重构非遗机构内容生产流程，用定制化 Prompt 将产出周期从 2–3 天压缩到数小时</li>
+									<li>使用 AIGC 视频与动画技术，让传统纹样以更适合当下传播的方式呈现</li>
+								</ul>
+								<div class="expTags" aria-label="相关标签">
+										<span class="expTag">Prompt Engineering</span>
+										<span class="expTag">AIGC</span>
+								</div>
+							</div>
+						</article>
+					</section>
+
+						<section id="lab" class="rightSection">
+						<h2 class="numbered-heading">我的 AI 实验室</h2>
+						<p>用 Cursor 做 Vibe Coding，对我来说就像多了一个随时在线、愿意陪我试错的搭档。</p>
+						<p>
+							我用这种方式独立做过一个带数据分析能力的 AI 笔记网站，目标很简单：看看产品经理不靠完整工程团队，能把产品做到什么程度。结论是：比我一开始想的要远得多，也比我想的艰难的多。
+						</p>
+						<a class="archive-link" href="/build-lab">进入实验室</a>
+
+							<ul class="projects-grid">
+								<li class="project-card">
+									<div class="project-inner">
+										<header class="project-top">
+											<h3 class="project-title"><a href="/build-lab">AI 笔记网站</a></h3>
+											<div class="project-links">
+												<a href="/build-lab" aria-label="查看">查看</a>
+											</div>
+										</header>
+										<p class="project-desc">
+											Vibe Coding 从 0 独立搭建一个AI笔记应用，支持链接/内容解析，支持可视化数据分析
+										</p>
+										<ul class="project-tech">
+											<li>Cursor</li>
+											<li>Next.js</li>
+										<li>Vercel</li>
+									</ul>
+								</div>
+							</li>
+							<li class="project-card">
+								<div class="project-inner">
+									<header class="project-top">
+										<h3 class="project-title"><a href="/build-lab#aigc-visuals">AI与非遗</a></h3>
+										<div class="project-links">
+											<a href="/build-lab#aigc-visuals" aria-label="查看">查看</a>
+										</div>
+									</header>
+									<p class="project-desc">
+										探索AI与非遗元素的结合，利用AI传播更多的非遗故事
+										</p>
+										<ul class="project-tech">
+											<li>AIGC</li>
+											<li>非遗元素</li>
+											<li>AI视频</li>
+										</ul>
+									</div>
+								</li>
+						</ul>
+						</section>
+
+					<section id="stack" class="rightSection">
+						<h2 class="numbered-heading">技术栈 / 工具箱</h2>
+						<p>下面是我最近常用的一些技术和工具，基本都是「用着顺手、真能交付」的那种：</p>
+
+						<h3 style="margin-top: 22px;">AI 相关</h3>
+						<ul class="skills-list">
+							<li>RAG / SFT 思路</li>
+							<li>意图识别与路由</li>
+							<li>可靠性分层</li>
+							<li>多智能体系统（Multi-Agent）</li>
+							<li>评测机制</li>
+							<li>安全机制</li>
+						</ul>
+
+						<h3 style="margin-top: 22px;">灵感与验证</h3>
+						<ul class="skills-list">
+							<li>ChatGPT</li>
+							<li>Gemini</li>
+						</ul>
+
+						<h3 style="margin-top: 22px;">开发与交付</h3>
+						<ul class="skills-list">
+							<li>Cursor</li>
+							<li>Coze</li>
+							<li>Next.js</li>
+							<li>Tailwind CSS</li>
+							<li>Vercel</li>
+							<li>Turso</li>
+						</ul>
+
+						<h3 style="margin-top: 22px;">AIGC 工具</h3>
+						<ul class="skills-list">
+							<li>Runway</li>
+							<li>可灵</li>
+							<li>可画</li>
+							<li>即梦</li>
+						</ul>
+					</section>
+				</div>
+			</div>
+		</div>
+
+		<script>
+			const scrollRoot = document.querySelector("[data-home-scroll]");
+			const sectionLinks = Array.from(document.querySelectorAll("[data-section-link]"));
+			const sections = sectionLinks
+				.map((a) => document.getElementById(a.getAttribute("href")?.slice(1) ?? ""))
+				.filter(Boolean);
+
+		const setActive = (id) => {
+			sectionLinks.forEach((a) => a.classList.toggle("is-active", a.dataset.sectionLink === id));
+		};
+
+			sectionLinks.forEach((a) => {
+				a.addEventListener("click", (e) => {
+					const href = a.getAttribute("href");
+					if (!href || !href.startsWith("#")) return;
+					const target = document.getElementById(href.slice(1));
+					if (!target) return;
+					e.preventDefault();
+					target.scrollIntoView({ behavior: "smooth", block: "start" });
+				});
+			});
+
+			if (scrollRoot && "IntersectionObserver" in window) {
+				const observer = new IntersectionObserver(
+					(entries) => {
+						const visible = entries
+							.filter((e) => e.isIntersecting)
+						.sort((a, b) => (b.intersectionRatio ?? 0) - (a.intersectionRatio ?? 0))[0];
+					if (visible?.target?.id) setActive(visible.target.id);
+				},
+				{ root: scrollRoot, threshold: [0.15, 0.35, 0.6] },
+			);
+			sections.forEach((s) => observer.observe(s));
+		}
+
+		const tabs = Array.from(document.querySelectorAll("[data-job-tab]"));
+		const panels = Array.from(document.querySelectorAll("[data-job-panel]"));
+		const highlight = document.querySelector(".jobs-highlight");
+
+		const setJobActive = (index) => {
+			tabs.forEach((tab, i) => {
+				const isActive = i === index;
+				tab.classList.toggle("is-active", isActive);
+				tab.setAttribute("aria-selected", isActive ? "true" : "false");
+			});
+			panels.forEach((panel, i) => {
+				panel.classList.toggle("is-active", i === index);
+			});
+			if (highlight) {
+				highlight.style.transform = `translateY(${index * 42}px)`;
+			}
+		};
+
+		tabs.forEach((tab, index) => {
+			tab.addEventListener("click", () => setJobActive(index));
+		});
+		setJobActive(0);
+	</script>
+</BaseLayout>

@@ -1,0 +1,328 @@
+---
+import type { GalleryItem } from "../data/portfolio";
+
+type Props = {
+	gallery: GalleryItem[];
+	showBrowserChrome?: boolean;
+};
+
+const { gallery, showBrowserChrome = true } = Astro.props;
+const slides = gallery ?? [];
+---
+
+<section class="root" data-showcase="product">
+	<div class="frame">
+		{showBrowserChrome ? (
+			<div class="chrome" aria-hidden="true">
+				<span class="dot red"></span>
+				<span class="dot yellow"></span>
+				<span class="dot green"></span>
+				<span class="bar"></span>
+			</div>
+		) : null}
+
+		<div class="viewport" data-viewport tabindex="0" aria-label="媒体展示（可左右切换）">
+			<div class="track" data-track>
+				{slides.map((m, idx) => (
+					<div class="slide" data-slide aria-label={`第 ${idx + 1} 张`} aria-hidden={idx === 0 ? "false" : "true"}>
+						{m.kind === "image" ? (
+							<img class="media" src={m.src} alt={m.alt ?? ""} loading="lazy" />
+						) : (
+							<video class="media" src={m.src} poster={m.poster} controls playsinline preload="metadata"></video>
+						)}
+					</div>
+				))}
+			</div>
+		</div>
+
+		<div class="overlay">
+			<button class="nav prev" type="button" data-prev aria-label="上一张">
+				←
+			</button>
+			<div class="counter" aria-label="当前索引" data-counter>
+				1 / {Math.max(1, slides.length)}
+			</div>
+			<button class="nav next" type="button" data-next aria-label="下一张">
+				→
+			</button>
+		</div>
+	</div>
+
+	{slides.length > 1 ? (
+		<div class="thumbs" aria-label="缩略图">
+			{slides.map((m, idx) => {
+				const thumbSrc = m.kind === "image" ? m.src : m.poster;
+				return (
+					<button class={`thumb${idx === 0 ? " is-active" : ""}`} type="button" data-thumb={idx} aria-label={`切换到第 ${idx + 1} 张`}>
+						{thumbSrc ? (
+							<img src={thumbSrc} alt="" loading="lazy" />
+						) : (
+							<span class="thumbFallback">{m.kind === "video" ? "VIDEO" : "IMG"}</span>
+						)}
+					</button>
+				);
+			})}
+		</div>
+	) : null}
+
+	<script type="module">
+		const roots = document.querySelectorAll('[data-showcase="product"]');
+		for (const root of roots) {
+			if (!(root instanceof HTMLElement)) continue;
+			if (root.dataset.inited === "true") continue;
+			root.dataset.inited = "true";
+
+			const viewport = root.querySelector("[data-viewport]");
+			const track = root.querySelector("[data-track]");
+			const prev = root.querySelector("[data-prev]");
+			const next = root.querySelector("[data-next]");
+			const counter = root.querySelector("[data-counter]");
+			const thumbs = Array.from(root.querySelectorAll("[data-thumb]"));
+			const slides = Array.from(root.querySelectorAll("[data-slide]"));
+			const total = slides.length;
+
+			if (!(viewport instanceof HTMLElement) || !(track instanceof HTMLElement) || total === 0) continue;
+
+			let activeIndex = 0;
+			let raf = 0;
+
+			const clamp = (v) => Math.min(Math.max(v, 0), Math.max(0, total - 1));
+			const slideWidth = () => viewport.clientWidth;
+			const scrollToIndex = (idx, behavior = "smooth") => {
+				activeIndex = clamp(idx);
+				viewport.scrollTo({ left: activeIndex * slideWidth(), behavior });
+			};
+
+			const setActive = (idx) => {
+				activeIndex = clamp(idx);
+
+				for (let i = 0; i < slides.length; i += 1) {
+					const isActive = i === activeIndex;
+					slides[i].setAttribute("aria-hidden", isActive ? "false" : "true");
+					const media = slides[i].querySelector("video");
+					if (!isActive && media instanceof HTMLVideoElement && !media.paused) media.pause();
+				}
+
+				for (let i = 0; i < thumbs.length; i += 1) {
+					if (!(thumbs[i] instanceof HTMLElement)) continue;
+					thumbs[i].classList.toggle("is-active", i === activeIndex);
+				}
+
+				if (counter instanceof HTMLElement) counter.textContent = `${activeIndex + 1} / ${total}`;
+				if (prev instanceof HTMLButtonElement) prev.disabled = activeIndex === 0;
+				if (next instanceof HTMLButtonElement) next.disabled = activeIndex === total - 1;
+			};
+
+			const onScroll = () => {
+				if (raf) cancelAnimationFrame(raf);
+				raf = requestAnimationFrame(() => {
+					const w = slideWidth();
+					if (!w) return;
+					const idx = Math.round(viewport.scrollLeft / w);
+					setActive(idx);
+				});
+			};
+
+			viewport.addEventListener("scroll", onScroll, { passive: true });
+			window.addEventListener(
+				"resize",
+				() => {
+					scrollToIndex(activeIndex, "auto");
+				},
+				{ passive: true },
+			);
+
+			prev?.addEventListener("click", () => scrollToIndex(activeIndex - 1));
+			next?.addEventListener("click", () => scrollToIndex(activeIndex + 1));
+
+			for (const t of thumbs) {
+				if (!(t instanceof HTMLButtonElement)) continue;
+				t.addEventListener("click", () => {
+					const idx = Number(t.dataset.thumb ?? "0");
+					scrollToIndex(idx);
+				});
+			}
+
+			setActive(0);
+			scrollToIndex(0, "auto");
+		}
+	</script>
+</section>
+
+<style>
+	.root {
+		max-width: 1100px;
+		margin: 0 auto;
+	}
+
+	.frame {
+		position: relative;
+		background: #f3f4f6;
+		border-radius: 16px;
+		overflow: hidden;
+		aspect-ratio: 16 / 9;
+		border: 1px solid rgba(15, 23, 42, 0.08);
+	}
+
+	.chrome {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 34px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 0 12px;
+		background: rgba(255, 255, 255, 0.8);
+		backdrop-filter: blur(10px) saturate(1.2);
+		border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+		z-index: 2;
+	}
+	.chrome .dot {
+		width: 10px;
+		height: 10px;
+		border-radius: 999px;
+		display: inline-block;
+	}
+	.chrome .red {
+		background: #ff5f57;
+	}
+	.chrome .yellow {
+		background: #febc2e;
+	}
+	.chrome .green {
+		background: #28c840;
+	}
+	.chrome .bar {
+		margin-left: 8px;
+		height: 12px;
+		flex: 1;
+		border-radius: 999px;
+		background: rgba(15, 23, 42, 0.06);
+	}
+
+	.viewport {
+		position: absolute;
+		inset: 0;
+		overflow-x: auto;
+		overflow-y: hidden;
+		scroll-snap-type: x mandatory;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: none;
+	}
+	.viewport::-webkit-scrollbar {
+		display: none;
+	}
+
+	.track {
+		height: 100%;
+		display: flex;
+	}
+	.slide {
+		min-width: 100%;
+		height: 100%;
+		scroll-snap-align: start;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		padding: 0;
+	}
+	.media {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+	.slide video.media {
+		background: #0b1220;
+	}
+
+	.overlay {
+		position: absolute;
+		left: 12px;
+		right: 12px;
+		bottom: 12px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 10px;
+		z-index: 3;
+		pointer-events: none;
+	}
+	.nav,
+	.counter {
+		pointer-events: auto;
+	}
+	.nav {
+		width: 36px;
+		height: 36px;
+		border-radius: 999px;
+		border: 1px solid rgba(15, 23, 42, 0.12);
+		background: rgba(255, 255, 255, 0.92);
+		box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+		cursor: pointer;
+	}
+	.nav:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
+	.counter {
+		font-weight: 700;
+		font-size: 12px;
+		letter-spacing: 0.02em;
+		color: rgba(15, 23, 42, 0.78);
+		background: rgba(255, 255, 255, 0.92);
+		border: 1px solid rgba(15, 23, 42, 0.1);
+		padding: 6px 10px;
+		border-radius: 999px;
+	}
+
+	.thumbs {
+		display: flex;
+		gap: 10px;
+		margin-top: 12px;
+		overflow-x: auto;
+		padding-bottom: 2px;
+		scroll-snap-type: x mandatory;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: none;
+	}
+	.thumbs::-webkit-scrollbar {
+		display: none;
+	}
+	.thumb {
+		flex: 0 0 auto;
+		width: 92px;
+		aspect-ratio: 16 / 9;
+		border-radius: 12px;
+		border: 1px solid rgba(15, 23, 42, 0.14);
+		background: #ffffff;
+		overflow: hidden;
+		cursor: pointer;
+		padding: 0;
+		scroll-snap-align: start;
+	}
+	.thumb.is-active {
+		border-color: rgba(37, 99, 235, 0.55);
+		box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16);
+	}
+	.thumb img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+	.thumbFallback {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 100%;
+		font-weight: 800;
+		font-size: 10px;
+		letter-spacing: 0.08em;
+		color: rgba(15, 23, 42, 0.55);
+		background: rgba(15, 23, 42, 0.04);
+	}
+</style>
+

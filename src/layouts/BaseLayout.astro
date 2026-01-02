@@ -1,0 +1,128 @@
+---
+import SiteNav from "../components/SiteNav.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import "../styles/global.css";
+import "../styles/resume-home.css";
+
+type Props = {
+	title: string;
+	description?: string;
+};
+
+const { title, description } = Astro.props;
+const currentPath = Astro.url.pathname;
+const isHome = currentPath === "/";
+const homeClass = isHome ? "resume-home" : undefined;
+---
+
+<!doctype html>
+<html lang="zh-CN" class={homeClass}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		{description ? <meta name="description" content={description} /> : null}
+		<meta property="og:title" content={title} />
+		{description ? <meta property="og:description" content={description} /> : null}
+		<meta property="og:type" content="website" />
+	</head>
+	<body class={homeClass}>
+		<a class="skip" href="#content">跳到正文</a>
+		<SiteNav currentPath={currentPath} />
+		<main id="content">
+			<slot />
+		</main>
+		{isHome ? null : <SiteFooter />}
+
+		<script>
+			const homeScroll = document.querySelector("[data-home-scroll]");
+			const main = document.getElementById("content");
+			if (homeScroll && main) {
+				main.addEventListener(
+					"wheel",
+					(e) => {
+						if (e.ctrlKey) return;
+						if (!(e.target instanceof Node)) return;
+						if (homeScroll.contains(e.target)) return;
+						homeScroll.scrollTop += e.deltaY;
+						homeScroll.scrollLeft += e.deltaX;
+						e.preventDefault();
+					},
+					{ passive: false },
+				);
+			}
+
+				const nav = document.querySelector("[data-site-nav]");
+				if (nav) {
+					let ticking = false;
+					const update = () => {
+						const y = homeScroll ? homeScroll.scrollTop : window.scrollY;
+						const scrolled = y > 8;
+						nav.dataset.scrolled = scrolled.toString();
+						if (homeScroll) {
+							document.documentElement.dataset.homeScrolled = scrolled.toString();
+							document.body.dataset.homeScrolled = scrolled.toString();
+						}
+						ticking = false;
+					};
+					const target = homeScroll || window;
+					target.addEventListener(
+						"scroll",
+					() => {
+						if (ticking) return;
+						ticking = true;
+						window.requestAnimationFrame(update);
+					},
+					{ passive: true },
+				);
+				update();
+			}
+
+			const codeBlocks = document.querySelectorAll("pre");
+			for (const pre of codeBlocks) {
+				const code = pre.querySelector("code");
+				if (!code) continue;
+				if (pre.querySelector("[data-code-copy]")) continue;
+
+				const button = document.createElement("button");
+				button.type = "button";
+				button.className = "code-copy";
+				button.dataset.codeCopy = "true";
+				button.textContent = "复制";
+				button.addEventListener("click", async () => {
+					try {
+						await navigator.clipboard.writeText(code.textContent ?? "");
+						button.textContent = "已复制";
+						window.setTimeout(() => (button.textContent = "复制"), 1200);
+					} catch {
+						button.textContent = "失败";
+						window.setTimeout(() => (button.textContent = "复制"), 1200);
+					}
+				});
+
+				pre.appendChild(button);
+			}
+		</script>
+
+		<style>
+			.skip {
+				position: absolute;
+				left: -9999px;
+				top: 10px;
+				background: white;
+				border: 1px solid var(--border);
+				border-radius: 12px;
+				padding: 10px 12px;
+			}
+			.skip:focus {
+				left: 10px;
+				z-index: 100;
+			}
+			main {
+				padding-bottom: 80px;
+			}
+		</style>
+	</body>
+</html>

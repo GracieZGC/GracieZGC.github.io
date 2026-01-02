@@ -1,0 +1,152 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { portfolioItems } from "../data/portfolio";
+import LabSplitFeature from "../components/LabSplitFeature.astro";
+import type { GalleryItem, PortfolioItem } from "../data/portfolio";
+
+const notebookGallery: GalleryItem[] = [
+	{ kind: "image", src: "/portfolio/笔记网站-首页.png", alt: "AI 笔记网站 - 首页" },
+	{ kind: "image", src: "/portfolio/笔记网站-解析页.png", alt: "AI 笔记网站 - 解析页" },
+	{ kind: "image", src: "/portfolio/笔记网站-AI助手页.png", alt: "AI 笔记网站 - AI 助手页" },
+	{ kind: "image", src: "/portfolio/笔记网站-AI分析页.png", alt: "AI 笔记网站 - AI 分析页" },
+	{ kind: "image", src: "/portfolio/笔记网站-AI分析页2.png", alt: "AI 笔记网站 - AI 分析页 2" },
+	{ kind: "image", src: "/portfolio/笔记网站-AI分析页3.png", alt: "AI 笔记网站 - AI 分析页 3" },
+	{ kind: "image", src: "/portfolio/笔记网站-分析列表页.png", alt: "AI 笔记网站 - 分析列表页" },
+	{ kind: "image", src: "/portfolio/笔记网站-笔记本页.png", alt: "AI 笔记网站 - 笔记本页" },
+];
+
+const notebookItem: PortfolioItem = {
+	slug: "ai-notebook",
+	title: "AI 笔记网站",
+	subtitle: "产品 Demo（左右滑动）",
+	type: "product",
+	tags: ["AI 笔记", "视觉分析", "检索", "工作流"],
+	gallery: notebookGallery,
+	description: "从 0 独立搭建：信息管理、视觉分析、检索与复用。",
+	focusPoints: ["信息管理与可复用结构", "视觉分析与检索体验", "AI 助手协作流程", "性能与可维护性"],
+};
+
+const mergedGallery: GalleryItem[] = [
+	{ kind: "image", src: "/portfolio/ai非遗.JPG", alt: "ai非遗" },
+	{ kind: "image", src: "/portfolio/民族海报.JPG", alt: "民族海报" },
+	{ kind: "image", src: "/portfolio/蓝染海报.JPG", alt: "蓝染海报" },
+];
+
+const mergedTags = Array.from(new Set(portfolioItems.flatMap((it) => it.tags ?? [])));
+
+const mergedItem: PortfolioItem = {
+	slug: "aigc-visuals",
+	title: "非遗 AIGC 视觉实验",
+	subtitle: "3 张海报（左右滑动）",
+	type: "visual",
+	tags: mergedTags,
+	gallery: mergedGallery,
+	description: "把一组非遗题材的 AIGC 视觉实验放进同一个窗口里浏览。",
+	focusPoints: ["风格一致性", "材质/纹理表达", "题材语义与构图", "可复用提示词方向"],
+};
+
+const enterpriseItem: PortfolioItem = {
+	slug: "enterprise-ai-agent-flow",
+	title: "AI非遗动画",
+	subtitle: "项目展示",
+	type: "product",
+	tags: ["AIGC", "非遗动画"],
+	gallery: [],
+	description: "用AI讲述非遗故事",
+	focusPoints: ["AIGC", "非遗动画"],
+};
+
+const enterpriseYoutube = "https://youtu.be/4iR7UHqd-sQ";
+const enterpriseYoutubePoster = "/portfolio/非遗龙舟.JPG";
+---
+
+<BaseLayout title="Build Lab｜Vibe Coding" description="用 Cursor + 大模型快速协作开发，输出可演示的产品。">
+	<section class="page">
+		<div class="container">
+			{portfolioItems.length === 0 ? (
+				<div class="empty card card-pad">
+					<p class="muted" style="margin: 0">
+						把作品的图片/视频放到 <code>public/portfolio/</code>，然后在 <code>src/data/portfolio.ts</code> 里添加条目。
+					</p>
+				</div>
+			) : (
+				<div class="lab" aria-label="Build Lab 展示">
+					<LabSplitFeature
+						title={notebookItem.title}
+						description={notebookItem.description}
+						tags={notebookItem.tags}
+						gallery={notebookItem.gallery}
+						mediaSide="right"
+						mediaAccent={true}
+						showChrome={false}
+						actions={[
+							{
+								label: "View project ↗",
+								href: "https://github.com/Gwen-Z/EchoNotes",
+								external: true,
+								variant: "accent",
+							},
+						]}
+					/>
+
+					<div class="divider" aria-hidden="true"></div>
+
+					<LabSplitFeature
+						id="aigc-visuals"
+						title={mergedItem.title}
+						description={mergedItem.description}
+						tags={mergedItem.tags}
+						gallery={mergedItem.gallery}
+						mediaSide="left"
+						mediaAccent={false}
+						showChrome={false}
+						actions={[
+							{
+								label: "View project ↗",
+								href: "/guides/非遗-aigc-创作笔记一-从参考图开始-反向提取风格",
+								variant: "accent",
+							},
+						]}
+					/>
+
+					<div class="divider" aria-hidden="true"></div>
+
+					<LabSplitFeature
+						title={enterpriseItem.title}
+						description={enterpriseItem.description}
+						tags={enterpriseItem.tags}
+						poster={{ href: enterpriseYoutube, imageSrc: enterpriseYoutubePoster, alt: enterpriseItem.title }}
+						mediaSide="right"
+						mediaAccent={false}
+							aspectRatio="16 / 9"
+							showChrome={false}
+							actions={[]}
+						/>
+					</div>
+				)}
+			</div>
+	</section>
+
+		<style>
+			.page {
+				padding: 28px 0 60px;
+			}
+
+			.lab {
+				display: grid;
+				gap: 32px;
+			}
+
+			.divider {
+				height: 1px;
+				background: rgba(15, 23, 42, 0.08);
+				margin: 0;
+			}
+
+			@media (max-width: 980px) {
+				.divider {
+					margin: 0;
+				}
+			}
+		</style>
+	</BaseLayout>

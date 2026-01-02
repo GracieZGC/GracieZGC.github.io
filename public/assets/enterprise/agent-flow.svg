@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520">
+  <defs>
+    <style>
+      .bg{fill:#f8fafc}
+      .card{fill:#ffffff;stroke:#cbd5e1;stroke-width:2}
+      .t{fill:#0f172a;font:600 20px -apple-system,BlinkMacSystemFont,Segoe UI,PingFang SC,Hiragino Sans GB,Microsoft YaHei,Arial}
+      .s{fill:#475569;font:400 14px -apple-system,BlinkMacSystemFont,Segoe UI,PingFang SC,Hiragino Sans GB,Microsoft YaHei,Arial}
+      .arrow{stroke:#94a3b8;stroke-width:3;fill:none;marker-end:url(#m)}
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1200" height="520"/>
+
+  <rect class="card" x="70" y="120" rx="18" ry="18" width="240" height="140"/>
+  <text class="t" x="110" y="170">Planner</text>
+  <text class="s" x="110" y="200">任务拆解 / 计划</text>
+
+  <rect class="card" x="370" y="60" rx="18" ry="18" width="260" height="140"/>
+  <text class="t" x="410" y="110">Retriever</text>
+  <text class="s" x="410" y="140">召回 / 证据</text>
+
+  <rect class="card" x="370" y="240" rx="18" ry="18" width="260" height="140"/>
+  <text class="t" x="410" y="290">Executor</text>
+  <text class="s" x="410" y="320">执行 / 工具调用</text>
+
+  <rect class="card" x="720" y="150" rx="18" ry="18" width="260" height="140"/>
+  <text class="t" x="760" y="200">Critic</text>
+  <text class="s" x="760" y="230">校验 / 复核</text>
+
+  <rect class="card" x="1020" y="150" rx="18" ry="18" width="140" height="140"/>
+  <text class="t" x="1048" y="205">输出</text>
+  <text class="s" x="1048" y="235">可追溯</text>
+
+  <path class="arrow" d="M310 190 C340 190, 340 130, 370 130"/>
+  <path class="arrow" d="M310 190 C340 190, 340 310, 370 310"/>
+  <path class="arrow" d="M630 130 C680 130, 680 200, 720 200"/>
+  <path class="arrow" d="M630 310 C680 310, 680 240, 720 240"/>
+  <path class="arrow" d="M980 220 L1020 220"/>
+
+  <text class="s" x="70" y="460">占位图：把你的 draw.io 流程图导出为 SVG 替换此文件即可。</text>
+</svg>
+

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520">
+  <defs>
+    <style>
+      .bg{fill:#ffffff}
+      .card{fill:#f9fafb;stroke:#e5e7eb;stroke-width:2}
+      .t{fill:#333333;font:600 20px -apple-system,BlinkMacSystemFont,Segoe UI,PingFang SC,Hiragino Sans GB,Microsoft YaHei UI,Microsoft YaHei,Arial}
+      .s{fill:#6b7280;font:400 14px -apple-system,BlinkMacSystemFont,Segoe UI,PingFang SC,Hiragino Sans GB,Microsoft YaHei UI,Microsoft YaHei,Arial}
+      .arrow{stroke:#9ca3af;stroke-width:3;fill:none;marker-end:url(#m)}
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#9ca3af"/>
+    </marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1200" height="520"/>
+
+  <text class="t" x="44" y="64">Cultural Tech Lab · 工作流图（占位）</text>
+  <text class="s" x="44" y="92">用你的 draw.io 导出 SVG 替换 `public/assets/identity/cultural-tech-lab.svg`</text>
+
+  <rect class="card" x="70" y="150" rx="18" ry="18" width="240" height="120"/>
+  <text class="t" x="104" y="205">输入约束</text>
+  <text class="s" x="104" y="236">目标 / 平台 / 口径</text>
+
+  <rect class="card" x="370" y="150" rx="18" ry="18" width="240" height="120"/>
+  <text class="t" x="404" y="205">素材池</text>
+  <text class="s" x="404" y="236">摘要 / 关键句</text>
+
+  <rect class="card" x="670" y="150" rx="18" ry="18" width="240" height="120"/>
+  <text class="t" x="704" y="205">生成</text>
+  <text class="s" x="704" y="236">结构 → 文案</text>
+
+  <rect class="card" x="970" y="150" rx="18" ry="18" width="160" height="120"/>
+  <text class="t" x="1000" y="205">校验</text>
+  <text class="s" x="1000" y="236">事实 / 合规</text>
+
+  <rect class="card" x="370" y="330" rx="18" ry="18" width="240" height="120"/>
+  <text class="t" x="404" y="385">发布</text>
+  <text class="s" x="404" y="416">封面 / 标题</text>
+
+  <rect class="card" x="670" y="330" rx="18" ry="18" width="240" height="120"/>
+  <text class="t" x="704" y="385">复盘</text>
+  <text class="s" x="704" y="416">失败样本回收</text>
+
+  <path class="arrow" d="M310 210 L370 210"/>
+  <path class="arrow" d="M610 210 L670 210"/>
+  <path class="arrow" d="M910 210 L970 210"/>
+  <path class="arrow" d="M1050 270 C1050 310, 860 310, 860 330"/>
+  <path class="arrow" d="M610 390 L670 390"/>
+  <path class="arrow" d="M490 330 C490 300, 250 300, 250 270"/>
+</svg>
+

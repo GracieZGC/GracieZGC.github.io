@@ -1,0 +1,134 @@
+---
+import WorkCarousel from "./WorkCarousel.astro";
+import type { GalleryItem } from "../data/portfolio";
+
+type LinkItem = {
+	label: string;
+	href: string;
+	external?: boolean;
+};
+
+type Props = {
+	title: string;
+	description: string;
+	tags: string[];
+	gallery: GalleryItem[];
+	links?: LinkItem[];
+	maxMediaWidth?: number;
+	rightWidth?: number;
+};
+
+const { title, description, tags, gallery, links = [], maxMediaWidth = 920, rightWidth = 460 } = Astro.props;
+---
+
+<section class="feature" style={`--right:${rightWidth}px;`} aria-label={title}>
+	<div class="grid">
+		<div class="media">
+			<WorkCarousel gallery={gallery} alt={title} maxWidth={maxMediaWidth} showChrome={true} />
+		</div>
+
+		<div class="info">
+			<h2 class="title">{title}</h2>
+			<p class="desc">{description}</p>
+
+			<div class="tagList" aria-label="标签">
+				{tags.map((t) => (
+					<div class="tagLine">{t}</div>
+				))}
+			</div>
+
+			{links.length ? (
+				<div class="links" aria-label="链接">
+					{links.map((l) => (
+						<a class="link" href={l.href} target={l.external ? "_blank" : undefined} rel={l.external ? "noreferrer" : undefined}>
+							{l.label}
+						</a>
+					))}
+				</div>
+			) : null}
+		</div>
+	</div>
+</section>
+
+<style>
+	.feature {
+		max-width: 1500px;
+		margin: 0 auto;
+	}
+
+	.grid {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, var(--right));
+		gap: 40px;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.media {
+		width: 100%;
+	}
+
+	.info {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: flex-start;
+		text-align: left;
+		min-height: 1px;
+	}
+
+	.title {
+		margin: 0;
+		font-size: 34px;
+		font-weight: 900;
+		letter-spacing: 0.01em;
+		color: var(--text);
+		line-height: 1.15;
+	}
+
+	.desc {
+		margin: 12px 0 0;
+		color: var(--muted);
+		line-height: 1.8;
+	}
+
+	.tagList {
+		display: grid;
+		gap: 10px;
+		margin-top: 18px;
+		color: var(--body);
+	}
+
+	.tagLine {
+		font-weight: 600;
+		letter-spacing: 0.01em;
+	}
+
+	.links {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+		margin-top: 22px;
+	}
+
+	.link {
+		font-size: 14px;
+		font-weight: 700;
+		color: var(--accent);
+		text-decoration: none;
+		width: fit-content;
+	}
+	.link:hover {
+		text-decoration: underline;
+	}
+
+	@media (max-width: 980px) {
+		.grid {
+			grid-template-columns: 1fr;
+			gap: 18px;
+		}
+		.title {
+			font-size: 26px;
+		}
+	}
+</style>

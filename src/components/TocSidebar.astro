@@ -1,0 +1,163 @@
+---
+type Heading = {
+	depth: number;
+	slug: string;
+	text: string;
+};
+
+type Props = {
+	headings: Heading[];
+	title?: string;
+};
+
+const { headings, title = "目录" } = Astro.props;
+---
+
+{headings?.length ? (
+	<aside class="toc" aria-label={title}>
+		<div class="tocTop">
+			<div class="tocTitle">{title}</div>
+		</div>
+
+		<nav class="tocNav" aria-label={title}>
+			<ol class="tocList">
+				{headings.map((h) => (
+					<li class:list={["tocItem", h.depth >= 3 && "indent"]}>
+						<a class="tocLink" href={`#${h.slug}`} data-toc-link data-slug={h.slug}>
+							{h.text}
+						</a>
+					</li>
+				))}
+			</ol>
+		</nav>
+
+		<script>
+			(() => {
+				const root = document.currentScript?.parentElement;
+				if (!root) return;
+
+				const links = Array.from(root.querySelectorAll("[data-toc-link]"));
+				const ids = links.map((a) => a.getAttribute("href")?.slice(1)).filter(Boolean);
+				const sections = ids
+					.map((id) => (id ? document.getElementById(id) : null))
+					.filter(Boolean);
+
+				const setActive = (id) => {
+					for (const a of links) a.classList.toggle("active", a.dataset.slug === id);
+				};
+
+				let lastActive = null;
+
+				const initFromHash = () => {
+					const raw = (window.location.hash || "").slice(1);
+					if (!raw) return;
+					if (ids.includes(raw)) {
+						lastActive = raw;
+						setActive(raw);
+					}
+				};
+
+				for (const a of links) {
+					a.addEventListener("click", () => {
+						const id = a.dataset.slug;
+						if (id) setActive(id);
+					});
+				}
+
+				if ("IntersectionObserver" in window) {
+					const obs = new IntersectionObserver(
+						(entries) => {
+							const visible = entries
+								.filter((e) => e.isIntersecting)
+								.sort((a, b) => (a.boundingClientRect.top ?? 0) - (b.boundingClientRect.top ?? 0));
+
+							const top = visible[0]?.target?.id;
+							if (top && top !== lastActive) {
+								lastActive = top;
+								setActive(top);
+							}
+						},
+						{ root: null, rootMargin: "-18% 0px -72% 0px", threshold: [0, 1] },
+					);
+
+					for (const s of sections) obs.observe(s);
+				} else {
+					const onScroll = () => {
+						let current = null;
+						for (const s of sections) {
+							const rect = s.getBoundingClientRect();
+							if (rect.top <= 120) current = s.id;
+						}
+						if (current && current !== lastActive) {
+							lastActive = current;
+							setActive(current);
+						}
+					};
+					window.addEventListener("scroll", onScroll, { passive: true });
+					onScroll();
+				}
+
+				initFromHash();
+				window.addEventListener("hashchange", initFromHash);
+			})();
+		</script>
+	</aside>
+) : null}
+
+<style>
+	.toc {
+		position: sticky;
+		top: calc(var(--nav-height) + 18px);
+		height: calc(100vh - var(--nav-height) - 36px);
+		overflow: auto;
+		background: var(--bg);
+		padding: 14px 12px;
+		border-right: 1px solid rgba(15, 23, 42, 0.06);
+	}
+	.tocTop {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+		padding: 8px 8px 10px;
+	}
+	.tocTitle {
+		font-size: 12px;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+		color: var(--muted);
+		font-weight: 700;
+	}
+	.tocNav {
+		padding: 0 6px 10px;
+	}
+	.tocList {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		display: grid;
+		gap: 6px;
+	}
+	.tocItem.indent {
+		padding-left: 14px;
+	}
+	.tocLink {
+		display: block;
+		padding: 8px 10px;
+		border-radius: 10px;
+		color: var(--muted);
+		line-height: 1.35;
+		text-decoration: none;
+		border: 1px solid transparent;
+	}
+	.tocLink:hover {
+		color: var(--text);
+		background: rgba(15, 23, 42, 0.03);
+		text-decoration: none;
+	}
+	.tocLink.active {
+		color: var(--text);
+		background: var(--accent-weak);
+		border-color: rgba(37, 99, 235, 0.18);
+	}
+</style>

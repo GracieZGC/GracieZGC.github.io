@@ -1,0 +1,161 @@
+---
+type NavItem = {
+	label: string;
+	href: string;
+	description?: string;
+};
+
+type Props = {
+	currentPath: string;
+};
+
+const { currentPath } = Astro.props;
+
+const navItems: NavItem[] = [
+	{ label: "首页", href: "/" },
+	{ label: "产品实验室", href: "/build-lab" },
+	{ label: "知识库", href: "/guides" },
+	{ label: "关于我", href: "/identity" },
+];
+
+const isActive = (href: string) => {
+	if (href === "/") return currentPath === "/";
+	return currentPath === href || currentPath.startsWith(href + "/");
+};
+---
+
+	<header class="header" data-site-nav data-scrolled="false">
+		<div class="container inner">
+			<a class="brand" href="/">
+				<span class="brand-text">
+					<span class="brand-title">Gracie's Blog</span>
+				</span>
+			</a>
+
+		<nav class="nav" aria-label="主导航">
+			{navItems.map((item) => (
+				<a class:list={["nav-link", isActive(item.href) && "active"]} href={item.href}>
+					<span class="nav-label">{item.label}</span>
+				</a>
+			))}
+		</nav>
+	</div>
+</header>
+
+	<style>
+		.header {
+			position: sticky;
+			top: 0;
+			z-index: 50;
+			height: var(--nav-height);
+			background: var(--bg);
+			border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+			backdrop-filter: blur(16px) saturate(1.2);
+			transition:
+				box-shadow 200ms ease,
+				border-color 200ms ease;
+		}
+		.header[data-scrolled="true"] {
+			border-bottom-color: rgba(15, 23, 42, 0.09);
+			box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+		}
+		.inner {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 16px;
+			height: 100%;
+			padding: 0 20px;
+		}
+		.brand {
+			display: inline-flex;
+			align-items: center;
+			gap: 10px;
+		text-decoration: none;
+	}
+	.brand:hover {
+		text-decoration: none;
+	}
+	.avatar {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 1.1em;
+		height: 1.1em;
+		border-radius: 999px;
+		background: var(--accent);
+		color: white;
+		font-weight: 700;
+		font-size: 0.85em;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+	}
+	.brand-text {
+		display: grid;
+		line-height: 1.1;
+	}
+	.brand-title {
+		font-weight: 600;
+		letter-spacing: 0.01em;
+		white-space: nowrap;
+	}
+	.brand-sub {
+		font-size: 14px;
+		font-weight: 500;
+		letter-spacing: 0.01em;
+		color: var(--muted);
+	}
+		.nav {
+			display: flex;
+			align-items: center;
+			gap: 32px;
+			flex-wrap: wrap;
+		}
+	.nav-link {
+		position: relative;
+		padding: 8px 2px;
+		text-decoration: none;
+	}
+	.nav-link:hover {
+		text-decoration: none;
+	}
+	.nav-link.active {
+		color: var(--text);
+	}
+	.nav-link.active::after {
+		content: "";
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 2px;
+		height: 2px;
+		border-radius: 999px;
+		background: var(--accent);
+	}
+	.nav-label {
+		font-size: 14px;
+		font-weight: 500;
+		letter-spacing: 0.01em;
+		color: var(--muted);
+	}
+	.nav-link.active .nav-label {
+		color: var(--text);
+	}
+	.nav-link:hover .nav-label {
+		color: var(--text);
+	}
+	.right {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+	@media (max-width: 860px) {
+		.right {
+			display: none;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.header {
+			transition: none;
+		}
+	}
+</style>

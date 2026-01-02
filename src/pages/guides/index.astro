@@ -1,0 +1,259 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import TagPill from "../../components/TagPill.astro";
+import { getCollection } from "astro:content";
+
+const entries = (await getCollection("guides", (e) => !e.data.draft)).sort(
+	(a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime(),
+);
+
+const allTags = Array.from(new Set(entries.flatMap((e) => e.data.tags))).sort((a, b) =>
+	a.localeCompare(b, "zh-Hans-CN"),
+);
+---
+
+<BaseLayout title="Guides｜知识库" description="提示词、AI PM 方法论、学习教程与工作流模板。">
+	<section class="page">
+		<div class="container">
+			<div class="stack">
+				<header class="head">
+					<div class="section-kicker">Guides</div>
+					<h1 class="title">知识库</h1>
+					<div class="section-underline" aria-hidden="true"></div>
+
+					<div class="controls">
+						<input
+							id="q"
+							class="search"
+							type="search"
+							placeholder="搜索标题 / 摘要 / 标签…"
+							autocomplete="off"
+						/>
+						<button id="clear" class="btn btn-ghost" type="button">清空</button>
+					</div>
+
+					<div class="tags" aria-label="标签筛选">
+						<button class="tagBtn active" type="button" data-tag="__all">全部</button>
+						{allTags.map((tag) => (
+							<button class="tagBtn" type="button" data-tag={tag}>
+								#{tag}
+							</button>
+						))}
+					</div>
+				</header>
+
+				<section class="listSection">
+					<ul id="list" class="list">
+						{entries.map((e) => {
+							const tagText = e.data.tags.join(" ");
+							return (
+								<li
+									class="item"
+									data-title={e.data.title}
+									data-desc={e.data.description ?? ""}
+									data-tags={tagText}
+								>
+									<div class="itemTop">
+										<a class="itemTitleLink" href={`/guides/${e.slug}`}>
+											<svg
+												class="itemTitleIcon"
+												viewBox="0 0 1024 1024"
+												version="1.1"
+												xmlns="http://www.w3.org/2000/svg"
+												aria-hidden="true"
+												focusable="false"
+											>
+												<path d="M0 0H307.2v1024H0z" fill="currentColor"></path>
+											</svg>
+											{e.data.title}
+										</a>
+										<div class="itemDate">{e.data.pubDate.toISOString().slice(0, 10)}</div>
+									</div>
+									<div class="tagRow" aria-label="标签">
+										{e.data.tags.map((t) => (
+											<span class="pill">#{t}</span>
+										))}
+									</div>
+								</li>
+							);
+						})}
+					</ul>
+					<div id="empty" class="empty muted" hidden>没有匹配结果。</div>
+				</section>
+			</div>
+		</div>
+	</section>
+
+	<script>
+		const input = document.getElementById("q");
+		const clear = document.getElementById("clear");
+		const list = document.getElementById("list");
+		const empty = document.getElementById("empty");
+		const tagButtons = Array.from(document.querySelectorAll(".tagBtn"));
+
+		let activeTag = "__all";
+
+		const normalize = (s) => (s || "").toString().toLowerCase().trim();
+
+		const apply = () => {
+			const q = normalize(input?.value);
+			const items = Array.from(list?.querySelectorAll(".item") ?? []);
+			let visible = 0;
+
+			for (const el of items) {
+				const title = normalize(el.dataset.title);
+				const desc = normalize(el.dataset.desc);
+				const tags = normalize(el.dataset.tags);
+
+				const matchQ = !q || title.includes(q) || desc.includes(q) || tags.includes(q);
+				const matchTag = activeTag === "__all" || (el.dataset.tags ?? "").split(" ").includes(activeTag);
+
+				const show = matchQ && matchTag;
+				el.hidden = !show;
+				if (show) visible += 1;
+			}
+
+			if (empty) empty.hidden = visible !== 0;
+		};
+
+		const setActiveTag = (tag) => {
+			activeTag = tag;
+			for (const b of tagButtons) b.classList.toggle("active", b.dataset.tag === tag);
+			apply();
+		};
+
+		input?.addEventListener("input", apply);
+		clear?.addEventListener("click", () => {
+			if (input) input.value = "";
+			setActiveTag("__all");
+			apply();
+			input?.focus();
+		});
+
+		for (const b of tagButtons) {
+			b.addEventListener("click", () => setActiveTag(b.dataset.tag || "__all"));
+		}
+
+		const applyHash = () => {
+			const raw = (window.location.hash || "").trim();
+			if (!raw.startsWith("#tag=")) return;
+			const tag = decodeURIComponent(raw.slice("#tag=".length));
+			const exists = tagButtons.some((b) => b.dataset.tag === tag);
+			if (exists) setActiveTag(tag);
+		};
+
+		window.addEventListener("hashchange", applyHash);
+		applyHash();
+	</script>
+
+	<style>
+		.page {
+			padding: 30px 0 60px;
+		}
+		.head {
+			padding: 6px 0 10px;
+		}
+		.title {
+			margin: 0;
+			font-size: 30px;
+			font-weight: 600;
+			letter-spacing: 0.02em;
+			line-height: 1.25;
+		}
+		.controls {
+			display: flex;
+			gap: 10px;
+			align-items: center;
+			margin-top: 14px;
+			flex-wrap: wrap;
+		}
+		.search {
+			flex: 1;
+			min-width: min(520px, 100%);
+			padding: 12px 14px;
+			border-radius: 14px;
+			border: 1px solid var(--border);
+			background: rgba(255, 255, 255, 0.75);
+			outline: none;
+		}
+		.search:focus {
+			border-color: rgba(37, 99, 235, 0.35);
+			box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+		}
+		.tags {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			margin-top: 14px;
+		}
+		.tagBtn {
+			padding: 4px 12px;
+			border-radius: 999px;
+			border: none;
+			background: #f9fafb;
+			box-shadow: none;
+			cursor: pointer;
+			font-size: 13px;
+			font-weight: 500;
+			letter-spacing: 0.01em;
+			color: var(--muted);
+		}
+		.tagBtn:hover {
+			background: #f3f4f6;
+		}
+		.tagBtn.active {
+			background: #eef2ff;
+			color: var(--text);
+		}
+		.list {
+			list-style: none;
+			padding-left: 0;
+			margin: 14px 0 0;
+			display: grid;
+			gap: 0;
+		}
+		.item {
+			border-bottom: 1px solid var(--border);
+			padding: 14px 0;
+		}
+		.itemTop {
+			display: flex;
+			justify-content: space-between;
+			gap: 12px;
+			align-items: baseline;
+		}
+		.itemTitleLink {
+			display: inline-flex;
+			align-items: baseline;
+			gap: 10px;
+			font-weight: 600;
+			letter-spacing: 0.02em;
+			text-decoration: none;
+			padding: 2px 0;
+		}
+		.itemTitleIcon {
+			width: 12px;
+			height: 12px;
+			color: var(--accent);
+			flex: none;
+			transform: translateY(1px);
+		}
+		.itemTitleLink:hover {
+			text-decoration: underline;
+		}
+		.itemDate {
+			font-size: 12px;
+			color: var(--muted);
+			white-space: nowrap;
+		}
+		.tagRow {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+			margin-top: 10px;
+		}
+		.empty {
+			margin-top: 14px;
+		}
+	</style>
+</BaseLayout>

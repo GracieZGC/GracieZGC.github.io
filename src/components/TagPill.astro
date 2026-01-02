@@ -1,0 +1,43 @@
+---
+type Props = {
+	tag: string;
+	href?: string;
+	active?: boolean;
+};
+
+const { tag, href, active = false } = Astro.props;
+---
+
+{href ? (
+	<a class:list={["tag", active && "active"]} href={href}>
+		#{tag}
+	</a>
+) : (
+	<span class:list={["tag", active && "active"]}>#{tag}</span>
+)}
+
+<style>
+	.tag {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		padding: 4px 12px;
+		border-radius: 999px;
+		border: none;
+		background: #f9fafb;
+		box-shadow: none;
+		font-size: 13px;
+		font-weight: 500;
+		letter-spacing: 0.01em;
+		color: var(--muted);
+		text-decoration: none;
+	}
+	.tag:hover {
+		text-decoration: none;
+		background: #f3f4f6;
+	}
+	.tag.active {
+		background: #eef2ff;
+		color: var(--text);
+	}
+</style>

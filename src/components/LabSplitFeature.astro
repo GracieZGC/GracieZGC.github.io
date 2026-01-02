@@ -1,0 +1,329 @@
+---
+import WorkCarousel from "./WorkCarousel.astro";
+import type { GalleryItem } from "../data/portfolio";
+
+type ActionItem = {
+	label: string;
+	href: string;
+	external?: boolean;
+	variant?: "primary" | "secondary" | "accent";
+};
+
+type Props = {
+	id?: string;
+	title: string;
+	description: string;
+	tags?: string[];
+	gallery?: GalleryItem[];
+	embed?: {
+		src: string;
+		title?: string;
+	};
+	poster?: {
+		imageSrc: string;
+		href: string;
+		alt?: string;
+	};
+	actions?: ActionItem[];
+	mediaSide?: "left" | "right";
+	mediaAccent?: boolean;
+	maxMediaWidth?: number;
+	aspectRatio?: string;
+	showChrome?: boolean;
+};
+
+const {
+	id,
+	title,
+	description,
+	tags = [],
+	gallery = [],
+	embed,
+	poster,
+	actions = [],
+	mediaSide = "right",
+	mediaAccent = false,
+	maxMediaWidth = 920,
+	aspectRatio = "16 / 9",
+	showChrome = false,
+} = Astro.props;
+
+const ordered = mediaSide === "left" ? "is-left" : "is-right";
+---
+
+<section id={id} class:list={["feature", ordered]} aria-label={title}>
+	<div class="copy">
+		<h2 class="title">{title}</h2>
+		<p class="desc">{description}</p>
+
+		{tags.length ? (
+			<div class="tags" aria-label="标签">
+				{tags.map((t) => (
+					<span class="pill">{t}</span>
+				))}
+			</div>
+		) : null}
+
+		{actions.length ? (
+			<div class="actions" aria-label="链接">
+				{actions.map((a, idx) => {
+					const variant = a.variant ?? (idx === 0 ? "primary" : "secondary");
+					const className =
+						variant === "primary"
+							? "action primary"
+							: variant === "accent"
+								? "action accent"
+								: "action secondary";
+					return (
+						<a class={className} href={a.href} target={a.external ? "_blank" : undefined} rel={a.external ? "noreferrer" : undefined}>
+							{a.label}
+						</a>
+					);
+				})}
+			</div>
+		) : null}
+	</div>
+
+	<div class:list={["media", mediaAccent && "accent"]}>
+		{poster ? (
+			<a class="posterLink" href={poster.href} target="_blank" rel="noreferrer" aria-label={`在新窗口打开：${title}`}>
+				<div class="poster" style={`max-width:${maxMediaWidth}px; aspect-ratio:${aspectRatio};`}>
+					<img class="posterImg" src={poster.imageSrc} alt={poster.alt ?? title} loading="lazy" />
+					<span class="posterPlay" aria-hidden="true">
+						<svg class="posterPlayIcon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+							<path
+								d="M426.666667 682.666667V384l256 149.845333L426.666667 682.666667z m587.093333-355.541334s-10.026667-71.04-40.704-102.357333c-38.954667-41.088-82.602667-41.258667-102.613333-43.648C727.168 170.666667 512.213333 170.666667 512.213333 170.666667h-0.426666s-214.954667 0-358.229334 10.453333c-20.053333 2.389333-63.658667 2.56-102.656 43.648-30.677333 31.317333-40.661333 102.4-40.661333 102.4S0 410.538667 0 493.952v78.293333c0 83.456 10.24 166.912 10.24 166.912s9.984 71.04 40.661333 102.357334c38.997333 41.088 90.154667 39.765333 112.938667 44.074666C245.76 893.568 512 896 512 896s215.168-0.341333 358.442667-10.752c20.053333-2.432 63.658667-2.602667 102.613333-43.690667 30.72-31.317333 40.704-102.4 40.704-102.4s10.24-83.413333 10.24-166.869333v-78.250667c0-83.456-10.24-166.912-10.24-166.912z"
+								fill="#FF0000"
+								fill-opacity="0.7"
+							></path>
+							<path d="M426.666667 682.666667V384l256 149.845333L426.666667 682.666667z" fill="#ffffff"></path>
+						</svg>
+					</span>
+				</div>
+			</a>
+		) : embed ? (
+			<div class="embed" style={`max-width:${maxMediaWidth}px; aspect-ratio:${aspectRatio};`}>
+				<iframe
+					class="embedFrame"
+					src={embed.src}
+					title={embed.title ?? title}
+					loading="lazy"
+					referrerpolicy="strict-origin-when-cross-origin"
+					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+					allowfullscreen
+				/>
+			</div>
+		) : (
+			<WorkCarousel gallery={gallery} alt={title} maxWidth={maxMediaWidth} aspectRatio={aspectRatio} showChrome={showChrome} />
+		)}
+	</div>
+</section>
+
+<style>
+	.feature {
+		display: grid;
+		grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+		gap: 56px;
+		align-items: center;
+		padding: 56px 64px;
+	}
+
+	.feature.is-left {
+		grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+	}
+	.feature.is-left .media {
+		order: 0;
+	}
+	.feature.is-left .copy {
+		order: 1;
+	}
+
+	.feature.is-right .copy {
+		order: 0;
+	}
+	.feature.is-right .media {
+		order: 1;
+	}
+
+	.copy {
+		max-width: 520px;
+	}
+
+	.title {
+		margin: 0;
+		font-size: 40px;
+		font-weight: 900;
+		letter-spacing: 0.01em;
+		line-height: 1.15;
+		color: var(--text);
+	}
+
+	.desc {
+		margin: 14px 0 0;
+		color: var(--muted);
+		font-size: 15px;
+		line-height: 1.9;
+	}
+
+	.tags {
+		margin-top: 18px;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 10px;
+	}
+
+	.actions {
+		margin-top: 22px;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 12px;
+	}
+
+	.action {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		padding: 10px 16px;
+		border-radius: 12px;
+		font-weight: 700;
+		font-size: 14px;
+		letter-spacing: 0.01em;
+		border: 1px solid transparent;
+		text-decoration: none;
+		transition:
+			transform 140ms ease,
+			background-color 140ms ease,
+			border-color 140ms ease;
+	}
+
+	.action:hover {
+		text-decoration: none;
+		transform: translateY(-1px);
+	}
+
+	.action.primary {
+		background: #0b1220;
+		color: white;
+	}
+
+	.action.primary:hover {
+		background: #111827;
+	}
+
+	.action.accent {
+		background: var(--accent);
+		color: white;
+	}
+
+	.action.accent:hover {
+		filter: brightness(0.95);
+	}
+
+	.action.secondary {
+		background: transparent;
+		border-color: var(--border);
+		color: var(--text);
+	}
+
+	.action.secondary:hover {
+		border-color: rgba(15, 23, 42, 0.32);
+		background: rgba(15, 23, 42, 0.03);
+	}
+
+	.media {
+		width: 100%;
+	}
+
+	.posterLink {
+		display: block;
+		width: 100%;
+		border-radius: var(--radius);
+		overflow: hidden;
+		text-decoration: none;
+	}
+	.posterLink:hover {
+		text-decoration: none;
+	}
+
+	.poster {
+		position: relative;
+		width: 100%;
+		margin: 0 auto;
+		overflow: hidden;
+		border-radius: var(--radius);
+		background: transparent;
+	}
+
+	.posterImg {
+		width: 100%;
+		height: 100%;
+		display: block;
+		object-fit: cover;
+	}
+
+	.posterPlay {
+		position: absolute;
+		inset: 0;
+		display: grid;
+		place-items: center;
+		pointer-events: none;
+		z-index: 1;
+	}
+
+	.posterPlayIcon {
+		width: clamp(72px, 8vw, 120px);
+		height: clamp(72px, 8vw, 120px);
+		filter: drop-shadow(0 12px 26px rgba(0, 0, 0, 0.3));
+		opacity: 0.98;
+	}
+
+	.embed {
+		width: 100%;
+		margin: 0 auto;
+		overflow: hidden;
+		border-radius: var(--radius);
+		background: transparent;
+	}
+
+	.embedFrame {
+		width: 100%;
+		height: 100%;
+		border: 0;
+		display: block;
+		background: transparent;
+	}
+
+	.media :global(.frame) {
+		border-radius: var(--radius);
+		border: none;
+		box-shadow: none;
+		background: transparent;
+	}
+
+	.media.accent :global(.frame) {
+		border: none;
+		box-shadow: none;
+	}
+
+	@media (max-width: 980px) {
+		.feature {
+			grid-template-columns: 1fr;
+			padding: 28px 22px;
+			gap: 22px;
+		}
+		.copy {
+			max-width: none;
+		}
+		.title {
+			font-size: 30px;
+		}
+		.feature.is-left .media,
+		.feature.is-right .media {
+			order: 0;
+		}
+		.feature.is-left .copy,
+		.feature.is-right .copy {
+			order: 1;
+		}
+	}
+</style>

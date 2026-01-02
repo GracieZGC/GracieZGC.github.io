@@ -1,0 +1,181 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import TagPill from "../../components/TagPill.astro";
+import TocSidebar from "../../components/TocSidebar.astro";
+import { getCollection } from "astro:content";
+
+export async function getStaticPaths() {
+	const entries = await getCollection("guides", (e) => !e.data.draft);
+	return entries.map((entry) => ({ params: { slug: entry.slug }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content, headings } = await entry.render();
+
+const related = (await getCollection("guides", (e) => !e.data.draft && e.slug !== entry.slug))
+	.filter((e) => e.data.tags.some((t) => entry.data.tags.includes(t)))
+	.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
+	.slice(0, 4);
+---
+
+<BaseLayout title={`${entry.data.title}｜Guides`} description={entry.data.description}>
+	<section class="page">
+		<div class="container">
+			<div class="layout">
+				<TocSidebar headings={headings} />
+
+				<div class="stack main">
+					<article class="card-pad">
+					<header class="head">
+						<div class="section-kicker">Guides</div>
+						<h1 class="title">
+							<svg
+								class="titleIcon"
+								viewBox="0 0 1024 1024"
+								version="1.1"
+								xmlns="http://www.w3.org/2000/svg"
+								aria-hidden="true"
+								focusable="false"
+							>
+								<path d="M0 0H307.2v1024H0z" fill="currentColor"></path>
+							</svg>
+							{entry.data.title}
+						</h1>
+						<div class="section-underline" aria-hidden="true"></div>
+						<div class="meta">
+							<span class="muted">{entry.data.pubDate.toISOString().slice(0, 10)}</span>
+							<span class="muted">·</span>
+							<a class="muted" href="/guides">返回列表</a>
+						</div>
+						{entry.data.description ? <p class="muted">{entry.data.description}</p> : null}
+						{entry.data.diagram ? (
+							<div class="diagram">
+								<img
+									src={entry.data.diagram}
+									alt={entry.data.diagramAlt ?? entry.data.title}
+									loading="lazy"
+								/>
+							</div>
+						) : null}
+						{entry.data.tags.length ? (
+							<div class="tagRow">
+								{entry.data.tags.map((t) => (
+									<TagPill tag={t} href={`/guides#tag=${encodeURIComponent(t)}`} />
+								))}
+							</div>
+						) : null}
+					</header>
+
+					<div class="content">
+						<Content />
+					</div>
+					</article>
+
+				{related.length ? (
+					<section class="card-pad">
+						<h2 class="section-title">相关文章</h2>
+						<ul class="rel">
+							{related.map((e) => (
+								<li>
+									<a href={`/guides/${e.slug}`}>{e.data.title}</a>
+								</li>
+							))}
+						</ul>
+					</section>
+				) : null}
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<style>
+		.page {
+			padding: 30px 0 60px;
+		}
+		.layout {
+			--side-gap: max(0px, calc((100vw - var(--maxw)) / 2));
+			display: grid;
+			grid-template-columns: 280px minmax(0, 1fr);
+			gap: 22px;
+			align-items: start;
+		}
+		.layout :global(.toc) {
+			margin-left: calc(-1 * (var(--side-gap) + 20px));
+		}
+		.main {
+			min-width: 0;
+		}
+		.title {
+			margin: 0;
+			font-size: 30px;
+			font-weight: 600;
+			letter-spacing: 0.02em;
+			line-height: 1.25;
+			display: inline-flex;
+			align-items: baseline;
+			gap: 10px;
+		}
+		.titleIcon {
+			width: 14px;
+			height: 14px;
+			color: var(--accent);
+			flex: none;
+			transform: translateY(1px);
+		}
+		.head {
+			display: grid;
+			gap: 10px;
+		}
+		.meta {
+			display: flex;
+			gap: 10px;
+			align-items: center;
+			flex-wrap: wrap;
+		}
+		.tagRow {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+		}
+		.content :global(h2) {
+			margin-top: 22px;
+			letter-spacing: 0.02em;
+		}
+		.content :global(p) {
+			margin: 10px 0;
+		}
+		.diagram {
+			margin-top: 12px;
+			padding: 14px;
+			border: 1px solid var(--border);
+			border-radius: 14px;
+			background: rgba(255, 255, 255, 0.65);
+			overflow: auto;
+		}
+		.diagram :global(img) {
+			display: block;
+			max-width: 100%;
+			height: auto;
+		}
+		.content :global(ul),
+		.content :global(ol) {
+			margin: 10px 0;
+			padding-left: 18px;
+		}
+		.rel {
+			margin: 12px 0 0;
+			padding-left: 18px;
+			display: grid;
+			gap: 8px;
+		}
+
+		@media (max-width: 860px) {
+			.layout {
+				grid-template-columns: 1fr;
+			}
+			.layout :global(.toc) {
+				display: none;
+			}
+		}
+	</style>
+</BaseLayout>

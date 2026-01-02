@@ -1,0 +1,303 @@
+---
+import type { GalleryItem } from "../data/portfolio";
+
+type Props = {
+	gallery: GalleryItem[];
+	alt?: string;
+	maxWidth?: number;
+	aspectRatio?: string;
+	showChrome?: boolean;
+};
+
+const { gallery, alt = "", maxWidth = 960, aspectRatio = "16 / 9", showChrome = false } = Astro.props;
+const items = gallery ?? [];
+---
+
+<section class="root" style={`max-width:${maxWidth}px;`} data-work-carousel>
+	<div class="frame" style={`aspect-ratio:${aspectRatio};`}>
+		{showChrome ? (
+			<div class="chrome" aria-hidden="true">
+				<span class="dot red"></span>
+				<span class="dot yellow"></span>
+				<span class="dot green"></span>
+				<span class="bar"></span>
+			</div>
+		) : null}
+
+		<div class="viewport" data-viewport aria-label="图片轮播（可左右切换）" tabindex="0">
+			<div class="track" data-track>
+				{items.map((m, idx) => (
+					<div class="slide" data-slide aria-hidden={idx === 0 ? "false" : "true"}>
+						{m.kind === "image" ? (
+							<img class="media" src={m.src} alt={m.alt ?? alt} loading={idx === 0 ? "eager" : "lazy"} />
+						) : (
+							<video class="media" src={m.src} poster={m.poster} controls playsinline preload="metadata"></video>
+						)}
+					</div>
+				))}
+			</div>
+		</div>
+
+		{items.length > 1 ? (
+			<div class="overlay" aria-label="轮播控制">
+				<button class="nav prev" type="button" data-prev aria-label="上一张">
+					<svg class="navIcon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+						<path d="M704 944c-10.88 0-22.4-3.84-31.36-11.52l-448-384c-10.88-8.96-16.64-22.4-16.64-36.48s6.4-27.52 16.64-36.48l448-384c19.84-17.28 50.56-14.72 67.84 5.12s14.72 50.56-5.12 67.84L329.6 512l405.76 347.52c19.84 17.28 22.4 47.36 5.12 67.84-9.6 10.88-23.04 16.64-36.48 16.64z"></path>
+					</svg>
+				</button>
+				<button class="nav next" type="button" data-next aria-label="下一张">
+					<svg class="navIcon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+						<path d="M288 944c10.88 0 22.4-3.84 31.36-11.52l448-384c10.88-8.96 16.64-22.4 16.64-36.48s-6.4-27.52-16.64-36.48l-448-384c-19.84-17.28-50.56-14.72-67.84 5.12s-14.72 50.56 5.12 67.84L662.4 512l-405.76 347.52c-19.84 17.28-22.4 47.36-5.12 67.84 9.6 10.88 23.04 16.64 36.48 16.64z"></path>
+					</svg>
+				</button>
+			</div>
+		) : null}
+	</div>
+
+	{items.length > 1 ? (
+		<div class="dots" aria-label="轮播页码" data-dots>
+			{items.map((_, idx) => (
+				<button class={`dot${idx === 0 ? " is-active" : ""}`} type="button" data-dot={idx} aria-label={`第 ${idx + 1} 张`} />
+			))}
+		</div>
+	) : null}
+
+	<script type="module">
+		const roots = document.querySelectorAll("[data-work-carousel]");
+		for (const root of roots) {
+			if (!(root instanceof HTMLElement)) continue;
+			if (root.dataset.inited === "true") continue;
+			root.dataset.inited = "true";
+
+			const viewport = root.querySelector("[data-viewport]");
+			const prev = root.querySelector("[data-prev]");
+			const next = root.querySelector("[data-next]");
+			const dots = Array.from(root.querySelectorAll("[data-dot]"));
+			const slides = Array.from(root.querySelectorAll("[data-slide]"));
+			const total = slides.length;
+
+			if (!(viewport instanceof HTMLElement) || total <= 1) {
+				continue;
+			}
+
+			let activeIndex = 0;
+			let raf = 0;
+
+			const clamp = (v) => Math.min(Math.max(v, 0), total - 1);
+			const width = () => viewport.clientWidth;
+			const scrollToIndex = (idx, behavior = "smooth") => {
+				activeIndex = clamp(idx);
+				viewport.scrollTo({ left: activeIndex * width(), behavior });
+			};
+
+			const setActive = (idx) => {
+				activeIndex = clamp(idx);
+
+				for (let i = 0; i < slides.length; i += 1) {
+					const isActive = i === activeIndex;
+					slides[i].setAttribute("aria-hidden", isActive ? "false" : "true");
+					const v = slides[i].querySelector("video");
+					if (!isActive && v instanceof HTMLVideoElement && !v.paused) v.pause();
+				}
+
+				for (let i = 0; i < dots.length; i += 1) {
+					if (!(dots[i] instanceof HTMLElement)) continue;
+					dots[i].classList.toggle("is-active", i === activeIndex);
+				}
+
+				if (prev instanceof HTMLButtonElement) prev.disabled = activeIndex === 0;
+				if (next instanceof HTMLButtonElement) next.disabled = activeIndex === total - 1;
+			};
+
+			const onScroll = () => {
+				if (raf) cancelAnimationFrame(raf);
+				raf = requestAnimationFrame(() => {
+					const w = width();
+					if (!w) return;
+					setActive(Math.round(viewport.scrollLeft / w));
+				});
+			};
+
+			viewport.addEventListener("scroll", onScroll, { passive: true });
+			window.addEventListener(
+				"resize",
+				() => {
+					scrollToIndex(activeIndex, "auto");
+				},
+				{ passive: true },
+			);
+
+			prev?.addEventListener("click", () => scrollToIndex(activeIndex - 1));
+			next?.addEventListener("click", () => scrollToIndex(activeIndex + 1));
+
+			for (const d of dots) {
+				if (!(d instanceof HTMLButtonElement)) continue;
+				d.addEventListener("click", () => scrollToIndex(Number(d.dataset.dot ?? "0")));
+			}
+
+			setActive(0);
+			scrollToIndex(0, "auto");
+		}
+	</script>
+</section>
+
+<style>
+	.root {
+		margin: 0 auto;
+		width: 100%;
+	}
+
+	.frame {
+		position: relative;
+		background: #f3f4f6;
+		border-radius: 32px;
+		border: 1px solid rgba(15, 23, 42, 0.06);
+		box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+		overflow: hidden;
+		min-height: 240px;
+	}
+
+	.chrome {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 38px;
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 0 14px;
+		background: rgba(255, 255, 255, 0.78);
+		backdrop-filter: blur(10px) saturate(1.2);
+		border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+		z-index: 2;
+	}
+	.chrome .dot {
+		width: 10px;
+		height: 10px;
+		border-radius: 999px;
+		display: inline-block;
+	}
+	.chrome .red {
+		background: #ff5f57;
+	}
+	.chrome .yellow {
+		background: #febc2e;
+	}
+	.chrome .green {
+		background: #28c840;
+	}
+	.chrome .bar {
+		margin-left: 8px;
+		height: 12px;
+		flex: 1;
+		border-radius: 999px;
+		background: rgba(15, 23, 42, 0.06);
+	}
+
+	.viewport {
+		position: absolute;
+		inset: 0;
+		overflow-x: auto;
+		overflow-y: hidden;
+		scroll-snap-type: x mandatory;
+		-webkit-overflow-scrolling: touch;
+		scrollbar-width: none;
+	}
+	.viewport::-webkit-scrollbar {
+		display: none;
+	}
+
+	.track {
+		height: 100%;
+		display: flex;
+	}
+	.slide {
+		min-width: 100%;
+		height: 100%;
+		scroll-snap-align: start;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.media {
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+	}
+	.slide video.media {
+		background: #0b1220;
+	}
+
+	.overlay {
+		position: absolute;
+		inset: 0;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		padding: 0 12px;
+		pointer-events: none;
+	}
+	.nav {
+		pointer-events: auto;
+		--nav-icon: 18px;
+		--nav-pad: 8px;
+		width: auto;
+		height: auto;
+		padding: var(--nav-pad);
+		border-radius: 999px;
+		border: none;
+		background: rgba(255, 255, 255, 0.3);
+		box-shadow: none;
+		cursor: pointer;
+		color: rgba(15, 23, 42, 0.8);
+		display: grid;
+		place-items: center;
+		transition: background-color 120ms ease, transform 120ms ease;
+	}
+	.nav:hover {
+		background: rgba(255, 255, 255, 0.35);
+	}
+	.nav:active {
+		background: rgba(255, 255, 255, 0.5);
+		transform: scale(0.98);
+	}
+	.nav:focus-visible {
+		outline: 2px solid rgba(255, 255, 255, 0.7);
+		outline-offset: 2px;
+	}
+	.nav:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
+
+	.navIcon {
+		width: var(--nav-icon);
+		height: var(--nav-icon);
+		display: block;
+		fill: currentColor;
+	}
+
+	.dots {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		justify-content: center;
+		margin-top: 14px;
+	}
+	.dot {
+		width: 8px;
+		height: 8px;
+		border-radius: 999px;
+		border: 1px solid rgba(15, 23, 42, 0.16);
+		background: rgba(15, 23, 42, 0.06);
+		cursor: pointer;
+		padding: 0;
+	}
+	.dot.is-active {
+		width: 18px;
+		background: rgba(37, 99, 235, 0.24);
+		border-color: rgba(37, 99, 235, 0.35);
+	}
+</style>
